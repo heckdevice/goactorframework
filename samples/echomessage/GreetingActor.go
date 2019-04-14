@@ -2,9 +2,9 @@ package echomessage
 
 import (
 	"fmt"
+	"github.com/heckdevice/goactorframework/core"
+	"github.com/heckdevice/goactorframework/samples/common"
 	"log"
-	"tracpilf/core"
-	"tracpilf/samples"
 )
 
 const (
@@ -20,7 +20,7 @@ func InitActor() {
 		log.Panic(fmt.Sprintf("Error while registering actor %v. Details : %v", greetingActor.ActorType, err.Error()))
 	}
 	greetingActor.RegisterMessageHandler(MessageTypeBYE, greetBye)
-	greetingActor.RegisterMessageHandler(samples.ConsolePrint, consolePrint)
+	greetingActor.RegisterMessageHandler(common.ConsolePrint, consolePrint)
 	go greetingActor.SpawnActor()
 }
 

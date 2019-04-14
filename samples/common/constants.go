@@ -1,4 +1,4 @@
-package samples
+package common
 
 const (
 	ConsolePrint = "ConsolePrint"

@@ -12,7 +12,7 @@ go run main.go
  Get Default Registry by invoking core.GetDefaultRegistry()
  
  Registry interface has following features :
- 
+ ```
  type registryInterface interface {
 	InitActorSystem(messageQueue chan Message)
 	Close()
@@ -20,7 +20,7 @@ go run main.go
 	UnregisterActor(string) error
 	GetActor(actorType string) (ActorMessagePipe, error)
  }
- 
+ ```
  Initialize the actor system using InitActorSystem function which takes the incoming message channel
  
  In sample examples this is provided by the InitSampleMessageQueue function

@@ -24,13 +24,14 @@ type actorSystem struct {
 	Name                 string
 }
 
-func GetDefaultActorSystem() *actorSystem {
+func GetDefaultRegistry() registryInterface {
 	return &actorSys
 }
 
 type registryInterface interface {
+	InitActorSystem(messageQueue chan Message)
 	Close()
-	RegisterActor(actor *Actor) error
+	RegisterActor(actor *Actor, messageType string, handler func(message Message)) error
 	UnregisterActor(string) error
 	GetActor(actorType string) (ActorMessagePipe, error)
 }
@@ -81,6 +82,10 @@ func (actorSys *actorSystem) GetActor(actorType string) (ActorMessagePipe, error
 func validateMessage(message Message) error {
 	//TODO implement basic validation for message mode and nil checks
 	return nil
+}
+
+func (actorSys *actorSystem) Close() {
+
 }
 
 func (actorSys *actorSystem) InitActorSystem(messageQueue chan Message) {

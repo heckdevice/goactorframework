@@ -17,7 +17,7 @@ var (
 func main() {
 	var terminateActorSystemSignal chan bool
 	signal.Notify(killPill, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSTOP, syscall.SIGTSTP)
-	core.GetDefaultActorSystem().InitActorSystem(samples.InitSampleMessageQueue())
+	core.GetDefaultRegistry().InitActorSystem(samples.InitSampleMessageQueue())
 	for {
 		select {
 		case <-killPill:

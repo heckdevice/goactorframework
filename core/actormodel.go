@@ -13,6 +13,7 @@ type Actor struct {
 	ActorType            string                   `json:"actor_type"`
 	handlers             map[string]func(Message) `json:"handlers"`
 	internalMessageQueue messageStack             `json:"message_queue"`
+	owner                *actorSystem
 }
 
 func (actor *Actor) HasMessages() bool {
@@ -24,4 +25,8 @@ func (actor *Actor) ScheduleActionableMessage(am *ActionableMessage) {
 }
 func (actor *Actor) StopAcceptingMessages() {
 	actor.isacceptingmessages = false
+}
+
+func (actor *Actor) NoOfMessagesInQueue() int {
+	return actor.internalMessageQueue.Len()
 }

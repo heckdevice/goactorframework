@@ -17,11 +17,13 @@ var (
 func init() {
 	actorSys = actorSystem{Name: "DefaultActorSystem"}
 	actorSys.registeredActorsPipe = make(map[string]ActorMessagePipe)
+	actorSys.ActorCloseAcked = make(chan bool)
 }
 
 type actorSystem struct {
 	registeredActorsPipe map[string]ActorMessagePipe
 	Name                 string
+	ActorCloseAcked      chan bool
 }
 
 func GetDefaultRegistry() registryInterface {
@@ -30,7 +32,7 @@ func GetDefaultRegistry() registryInterface {
 
 type registryInterface interface {
 	InitActorSystem(messageQueue chan Message)
-	Close()
+	Close(ackClose chan bool)
 	RegisterActor(actor *Actor, messageType string, handler func(message Message)) error
 	UnregisterActor(string) error
 	GetActor(actorType string) (ActorMessagePipe, error)
@@ -55,6 +57,7 @@ func (actorSys *actorSystem) RegisterActor(actor *Actor, messageType string, han
 	actor.closeChan = make(chan bool)
 	actorSys.registeredActorsPipe[actor.Type()] = actor
 	actor.isacceptingmessages = true
+	actor.owner = actorSys
 	mutex.Unlock()
 	return nil
 }
@@ -84,8 +87,30 @@ func validateMessage(message Message) error {
 	return nil
 }
 
-func (actorSys *actorSystem) Close() {
+func (actorSys *actorSystem) Close(ackClose chan bool) {
+	for _, actor := range actorSys.registeredActorsPipe {
+		actor.RequestClose()
+	}
+	go func(*actorSystem, chan bool) {
+		noOfActorsAcked := 0
+		log.Printf("Waiting for %v actors to ack close", len(actorSys.registeredActorsPipe))
+		for {
+			select {
+			case <-actorSys.ActorCloseAcked:
+				noOfActorsAcked = noOfActorsAcked + 1
+				log.Printf("Number of actors to ack close is %v", noOfActorsAcked)
+				if noOfActorsAcked == len(actorSys.registeredActorsPipe) {
+					log.Println("All actors acked close request")
+					return
+				}
+			}
+		}
+		ackClose <- true
+	}(actorSys, ackClose)
+}
 
+func (actorSys *actorSystem) AckActorClosed() {
+	actorSys.ActorCloseAcked <- true
 }
 
 func (actorSys *actorSystem) InitActorSystem(messageQueue chan Message) {
@@ -109,13 +134,12 @@ func (actorSys *actorSystem) startDispatcher(incomingMessages chan Message) {
 						if sendToActor.IsAcceptingMessages() {
 							sendToActor.Process(message)
 						} else {
-							//TODO - Persist message for later processing
 							log.Printf("!!!Actor %v is no longer accepting messages, please re-post for processing later!!!", message.Sender.ActorType)
 						}
 					}
 					//TODO Broadcast Support pending
 				case Broadcast:
-					log.Println("!!!Broadcast feature not yet implemented!!!")
+					log.Println("!!!Broadcast feature not yet implemented for all messages!!!")
 				}
 			}
 		}

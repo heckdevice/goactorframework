@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/heckdevice/goactorframework/core"
-	"github.com/heckdevice/goactorframework/samples"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/heckdevice/goactorframework/core"
+	"github.com/heckdevice/goactorframework/samples"
 )
 
 var (

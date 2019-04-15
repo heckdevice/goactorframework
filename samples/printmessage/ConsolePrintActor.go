@@ -2,9 +2,10 @@ package printmessage
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/heckdevice/goactorframework/core"
 	"github.com/heckdevice/goactorframework/samples/common"
-	"log"
 )
 
 const (

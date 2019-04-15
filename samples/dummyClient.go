@@ -1,12 +1,13 @@
 package samples
 
 import (
+	"math/rand"
+	"time"
+
 	"github.com/heckdevice/goactorframework/core"
 	"github.com/heckdevice/goactorframework/samples/common"
 	"github.com/heckdevice/goactorframework/samples/echomessage"
 	"github.com/heckdevice/goactorframework/samples/printmessage"
-	"math/rand"
-	"time"
 )
 
 var (

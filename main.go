@@ -11,25 +11,20 @@ import (
 
 var (
 	killPill         = make(chan os.Signal)
-	terminateProcess = make(chan chan bool)
+	terminateProcess = make(chan bool)
 )
 
 func main() {
-	var terminateActorSystemSignal chan bool
 	signal.Notify(killPill, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSTOP, syscall.SIGTSTP)
-	core.GetDefaultRegistry().InitActorSystem(samples.InitSampleMessageQueue())
+	oncomingMessages := samples.InitSampleMessageQueue()
+	core.GetDefaultRegistry().InitActorSystem(oncomingMessages)
 	for {
 		select {
 		case <-killPill:
 			fmt.Println(fmt.Sprintf("\n\n****** - Shutting down due to SIGTERM - ******"))
-			//core.ProcessKillPill(terminateActorSystemSignal)
-			fmt.Println("\n\n****** - SIGTERM Processed - ******")
-			return
-		case <-terminateActorSystemSignal:
-			//Define function in Actor for graceful shutdown
+			core.GetDefaultRegistry().Close(terminateProcess)
 		case <-terminateProcess:
-			fmt.Println("\n\n****** - Terminate process command received - ******")
-			//core.ProcessKillPill(terminateActorSystemSignal)
+			fmt.Println(fmt.Sprintf("\n\n****** - Actor system is stopped, exiting- ******"))
 			return
 		}
 	}

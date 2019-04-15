@@ -2,6 +2,7 @@ package core
 
 type ActorMessagePipe interface {
 	Process(message Message)
+	AckClose()
 	RequestClose()
 	Self() ActorBehaviour
 	GiveActionableMessage() (ActionableMessage, bool)
@@ -11,8 +12,11 @@ type ActorMessagePipe interface {
 func (actor *Actor) Process(message Message) {
 	actor.dataChan <- message
 }
-func (actor *Actor) RequestClose() {
+func (actor *Actor) AckClose() {
 	actor.closeChan <- true
+}
+func (actor *Actor) RequestClose() {
+	actor.Self().getDataChan() <- Message{MessageType: KillPill}
 }
 func (actor *Actor) Self() ActorBehaviour {
 	return actor

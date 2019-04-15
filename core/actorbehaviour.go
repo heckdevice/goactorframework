@@ -54,34 +54,39 @@ func (actor *Actor) SpawnActor() {
 			switch data.MessageType {
 			case KillPill:
 				//stop accepting messages
+				log.Println(fmt.Sprintf("Stopping Actor %v with id %v to accept any more messages", actor.ActorType, actor.id))
 				actor.StopAcceptingMessages()
-				//wait till all the messages are processed and the internal message queue is empty
-				log.Println(fmt.Sprintf("Actor %v with id %v got KillPill message", actor.ActorType, actor.id))
-				for {
-					if actor.HasMessages() {
-						log.Println(fmt.Sprintf("Actor %v still have messages in pipe, waiting for finishing the process before shutting down", actor.ActorType))
-						time.Sleep(time.Millisecond * 500)
-					} else {
-						close(actor.dataChan)
-						actor.RequestClose()
-						break
+				go func(actor *Actor) {
+					for {
+						if actor.HasMessages() {
+							log.Printf("!!!Actor %v still have %v messages in pipe!!!", actor.ActorType, actor.NoOfMessagesInQueue())
+							time.Sleep(time.Millisecond * 250)
+						} else {
+							log.Printf("!!!Actor %v have no more messages in pipe!!!", actor.ActorType)
+							actor.AckClose()
+							break
+						}
 					}
-				}
-				return
+				}(actor)
 			default:
 				//Default behaviour is to delegate the message to the actor pipe for processing
 				//as per the registered handlers
 				log.Println(fmt.Sprintf("Actor %v with id %v got message", actor.ActorType, actor.id))
-				if handlerFound, OK := actor.GetRegisteredHandlers()[data.MessageType]; OK {
-					actor.ScheduleActionableMessage(&ActionableMessage{data, handlerFound})
-				} else {
-					log.Fatalf(fmt.Sprintf("Actor %v has no handler for message type %v, rejecting the message", actor.ActorType, data.MessageType))
+				if actor.isacceptingmessages {
+					if handlerFound, OK := actor.GetRegisteredHandlers()[data.MessageType]; OK {
+						actor.ScheduleActionableMessage(&ActionableMessage{data, handlerFound})
+					} else {
+						log.Fatalf(fmt.Sprintf("Actor %v has no handler for message type %v, rejecting the message", actor.ActorType, data.MessageType))
+					}
 				}
 			}
 		case <-actor.closeChan:
-			log.Println(fmt.Sprintf("Actor %v closing down", actor.ActorType))
-			close(actor.closeChan)
+			log.Println(fmt.Sprintf("Actor %v closing down due to close signal", actor.ActorType))
+			actor.owner.AckActorClosed()
 			return
 		}
 	}
+	close(actor.dataChan)
+	close(actor.closeChan)
+	actor.internalMessageQueue.Clear()
 }

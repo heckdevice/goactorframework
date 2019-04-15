@@ -56,27 +56,18 @@ func (actor *Actor) SpawnActor() {
 				//stop accepting messages
 				log.Println(fmt.Sprintf("Stopping Actor %v with id %v to accept any more messages", actor.ActorType, actor.id))
 				actor.StopAcceptingMessages()
-				if !actor.HasMessages() {
-					close(actor.dataChan)
-					actor.AckClose()
-				} else {
-					//wait till all the messages are processed and the internal message queue is empty
-					log.Println(fmt.Sprintf("Actor %v with id %v already in process of shutting down, ignoring message", actor.ActorType, actor.id))
-					log.Println(fmt.Sprintf("Actor %v still have %v messages in pipe, waiting for finishing the process before shutting down", actor.ActorType, actor.NoOfMessagesInQueue()))
-					go func(actor *Actor) {
-						for {
-							if actor.HasMessages() {
-								log.Println(fmt.Sprintf("Actor %v still have %v messages in pipe, processing them before shutdown", actor.ActorType, actor.NoOfMessagesInQueue()))
-								time.Sleep(time.Millisecond * 250)
-							} else {
-								close(actor.dataChan)
-								actor.internalMessageQueue.Clear()
-								actor.AckClose()
-								return
-							}
+				go func(actor *Actor) {
+					for {
+						if actor.HasMessages() {
+							log.Printf("!!!Actor %v still have %v messages in pipe!!!", actor.ActorType, actor.NoOfMessagesInQueue())
+							time.Sleep(time.Millisecond * 250)
+						} else {
+							log.Printf("!!!Actor %v have no more messages in pipe!!!", actor.ActorType)
+							actor.AckClose()
+							break
 						}
-					}(actor)
-				}
+					}
+				}(actor)
 			default:
 				//Default behaviour is to delegate the message to the actor pipe for processing
 				//as per the registered handlers
@@ -91,9 +82,11 @@ func (actor *Actor) SpawnActor() {
 			}
 		case <-actor.closeChan:
 			log.Println(fmt.Sprintf("Actor %v closing down due to close signal", actor.ActorType))
-			close(actor.closeChan)
 			actor.owner.AckActorClosed()
 			return
 		}
 	}
+	close(actor.dataChan)
+	close(actor.closeChan)
+	actor.internalMessageQueue.Clear()
 }

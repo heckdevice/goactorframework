@@ -15,15 +15,13 @@ go run main.go
  ```
  type registryInterface interface {
 	InitActorSystem(messageQueue chan Message)
-	Close()
+	Close(terminateProcess chan bool)
 	RegisterActor(actor *Actor, messageType string, handler func(message Message)) error
 	UnregisterActor(string) error
 	GetActor(actorType string) (ActorMessagePipe, error)
- }
+}
  ```
- Initialize the actor system using InitActorSystem function which takes the incoming message channel
- 
- as in main.go
+ Initialize the actor system using InitActorSystem function which takes the incoming message channel as in main.go
  ```
  core.GetDefaultRegistry().InitActorSystem(samples.InitSampleMessageQueue())
  ```

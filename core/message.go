@@ -1,7 +1,7 @@
 package core
 
 const (
-	KillPill = "KILLPILL"
+	KILLPILL = "KILLPILL"
 )
 
 type DeliveryMode int

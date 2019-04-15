@@ -21,10 +21,10 @@ func main() {
 	for {
 		select {
 		case <-killPill:
-			fmt.Println(fmt.Sprintf("\n\n****** - Shutting down due to SIGTERM - ******"))
+			fmt.Println(fmt.Sprintf("\n\n******--- Shutting down due to SIGTERM ---******"))
 			core.GetDefaultRegistry().Close(terminateProcess)
 		case <-terminateProcess:
-			fmt.Println(fmt.Sprintf("\n\n****** - Actor system is stopped, exiting- ******"))
+			fmt.Println(fmt.Sprintf("\n\n******--- Actor system is stopped, exiting ---******"))
 			return
 		}
 	}

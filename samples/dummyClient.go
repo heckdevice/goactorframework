@@ -32,6 +32,6 @@ func pumpMessages() {
 		messageQueue <- core.Message{MessageType: common.ConsolePrint, Mode: core.Unicast, Sender: &dummySender, Payload: map[string]interface{}{"data": rand.Int()}, UnicastTo: &core.ActorReference{ActorType: printmessage.ActorType}}
 		messageQueue <- core.Message{MessageType: echomessage.MessageTypeHI, Mode: core.Unicast, Sender: &dummySender, Payload: map[string]interface{}{"data": rand.Int()}, UnicastTo: &core.ActorReference{ActorType: echomessage.ActorType}}
 		messageQueue <- core.Message{MessageType: echomessage.MessageTypeBYE, Mode: core.Unicast, Sender: &dummySender, Payload: map[string]interface{}{"data": rand.Int()}, UnicastTo: &core.ActorReference{ActorType: echomessage.ActorType}}
-		time.Sleep(time.Second * 3)
+		time.Sleep(time.Millisecond * 50)
 	}
 }

@@ -17,6 +17,7 @@ type ActorBehaviour interface {
 	Type() string
 }
 
+//*************************** ActorBehaviour interface methods ***************************
 func (actor *Actor) RegisterMessageHandler(messageType string, handler func(message Message)) error {
 	if _, OK := actor.handlers[messageType]; OK {
 		return errors.New(fmt.Sprintf("Handler for message type %v is already registered for actor %v", messageType, actor.ActorType))
@@ -47,12 +48,28 @@ func (actor *Actor) Type() string {
 	return actor.ActorType
 }
 
+//*************************** Instance methods ***************************
+func (actor *Actor) HasMessages() bool {
+	return actor.internalMessageQueue.Len() != 0
+}
+
+func (actor *Actor) ScheduleActionableMessage(am *ActionableMessage) {
+	actor.internalMessageQueue.Push(*am)
+}
+func (actor *Actor) StopAcceptingMessages() {
+	actor.isAcceptingMessages = false
+}
+
+func (actor *Actor) NoOfMessagesInQueue() int {
+	return actor.internalMessageQueue.Len()
+}
+
 func (actor *Actor) SpawnActor() {
 	for {
 		select {
 		case data := <-actor.dataChan:
 			switch data.MessageType {
-			case KillPill:
+			case KILLPILL:
 				//stop accepting messages
 				log.Println(fmt.Sprintf("Stopping Actor %v with id %v to accept any more messages", actor.ActorType, actor.id))
 				actor.StopAcceptingMessages()
@@ -72,7 +89,7 @@ func (actor *Actor) SpawnActor() {
 				//Default behaviour is to delegate the message to the actor pipe for processing
 				//as per the registered handlers
 				log.Println(fmt.Sprintf("Actor %v with id %v got message", actor.ActorType, actor.id))
-				if actor.isacceptingmessages {
+				if actor.isAcceptingMessages {
 					if handlerFound, OK := actor.GetRegisteredHandlers()[data.MessageType]; OK {
 						actor.ScheduleActionableMessage(&ActionableMessage{data, handlerFound})
 					} else {

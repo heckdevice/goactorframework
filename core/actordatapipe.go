@@ -16,7 +16,7 @@ func (actor *Actor) AckClose() {
 	actor.closeChan <- true
 }
 func (actor *Actor) RequestClose() {
-	actor.Self().getDataChan() <- Message{MessageType: KillPill}
+	actor.Self().getDataChan() <- Message{MessageType: KILLPILL}
 }
 func (actor *Actor) Self() ActorBehaviour {
 	return actor
@@ -27,5 +27,5 @@ func (actor *Actor) GiveActionableMessage() (ActionableMessage, bool) {
 }
 
 func (actor *Actor) IsAcceptingMessages() bool {
-	return actor.isacceptingmessages
+	return actor.isAcceptingMessages
 }

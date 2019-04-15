@@ -60,7 +60,7 @@ func (actorSys *actorSystem) RegisterActor(actor *Actor, messageType string, han
 	actor.dataChan = make(chan Message, 10)
 	actor.closeChan = make(chan bool)
 	actorSys.registeredActorsPipe[actor.Type()] = actor
-	actor.isacceptingmessages = true
+	actor.isAcceptingMessages = true
 	actor.owner = actorSys
 	mutex.Unlock()
 	return nil
@@ -135,8 +135,8 @@ func (actorSys *actorSystem) startDispatcher(incomingMessages chan Message) {
 			} else {
 				switch message.Mode {
 				case Unicast:
-					sendToActor, error := actorSys.GetActor(message.UnicastTo.ActorType)
-					if error != nil {
+					sendToActor, err := actorSys.GetActor(message.UnicastTo.ActorType)
+					if err != nil {
 						log.Printf("Actor %v not found to process message %v", message.UnicastTo.ActorType, message)
 					} else {
 						if sendToActor.IsAcceptingMessages() {

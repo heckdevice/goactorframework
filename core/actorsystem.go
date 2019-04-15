@@ -3,10 +3,11 @@ package core
 import (
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"log"
 	"strings"
 	"sync"
+
+	"github.com/google/uuid"
 )
 
 var (

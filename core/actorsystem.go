@@ -31,12 +31,14 @@ type actorSystem struct {
 	StopMessageExecutor  chan bool
 }
 
-func GetDefaultRegistry() registryInterface {
+// GetDefaultActorSystem - Returns the default actor system  "DefaultActorSystem" which is initialized but not yet started on package load
+func GetDefaultActorSystem() ActorSystem {
 	return &actorSys
 }
 
-type registryInterface interface {
-	InitActorSystem(messageQueue chan Message)
+// ActorSystem - Features of actor system
+type ActorSystem interface {
+	Start(messageQueue chan Message)
 	Close(terminateProcess chan bool)
 	RegisterActor(actor *Actor, messageType string, handler func(message Message)) error
 	UnregisterActor(string) error
@@ -48,10 +50,10 @@ type registryInterface interface {
 // its type defined and have at-least one message handler
 func (actorSys *actorSystem) RegisterActor(actor *Actor, messageType string, handler func(message Message)) error {
 	if actor == nil || len(strings.TrimSpace(actor.ActorType)) == 0 {
-		return errors.New(fmt.Sprintf("Invalid actor %v", actor))
+		return fmt.Errorf("invalid actor %v", actor)
 	}
 	if actorFound, OK := actorSys.registeredActorsPipe[actor.ActorType]; OK {
-		return errors.New(fmt.Sprintf("Actor %v is already registerd", actorFound.Self().Type()))
+		return fmt.Errorf("actor %v is already registered", actorFound.Self().Type())
 	}
 	mutex.Lock()
 	actor.id = actor.ActorType + "-" + uuid.New().String()
@@ -67,6 +69,7 @@ func (actorSys *actorSystem) RegisterActor(actor *Actor, messageType string, han
 	return nil
 }
 
+// UnregisterActor - Removes / un-registers and actor, if found, from the actor system. Errs if actor is not yet registered
 func (actorSys *actorSystem) UnregisterActor(actorType string) error {
 	if len(strings.TrimSpace(actorType)) == 0 {
 		return errors.New("actorType can not be empty")
@@ -74,17 +77,18 @@ func (actorSys *actorSystem) UnregisterActor(actorType string) error {
 	if actorFound, OK := actorSys.registeredActorsPipe[actorType]; OK {
 		actorFound.RequestClose()
 	} else {
-		return errors.New(fmt.Sprintf("Actor %v is not registerd", actorType))
+		return fmt.Errorf("actor %v is not registered", actorType)
 	}
 	return nil
 }
 
+// GetActor - Returns the registered actor given the actorType. Errs if actor not found
 func (actorSys *actorSystem) GetActor(actorType string) (ActorMessagePipe, error) {
 	if actorFound, OK := actorSys.registeredActorsPipe[actorType]; OK {
 		return actorFound, nil
 
 	}
-	return nil, errors.New(fmt.Sprintf("Actor %v is not registerd", actorType))
+	return nil, fmt.Errorf("actor %v is not registered", actorType)
 }
 
 func validateMessage(message Message) error {
@@ -92,6 +96,8 @@ func validateMessage(message Message) error {
 	return nil
 }
 
+// Close - Closes the actor system asynchronously  by sending RequestClose to all registered actor data pipe and waiting till all the registered actor shutdown/close.
+// Sends the acknowledgment to the terminateProcess channel when all the registered actors are closed.
 func (actorSys *actorSystem) Close(terminateProcess chan bool) {
 	noOfRegisteredActors := len(actorSys.registeredActorsPipe)
 	go func(*actorSystem, chan bool, int) {
@@ -116,16 +122,19 @@ func (actorSys *actorSystem) Close(terminateProcess chan bool) {
 	}
 }
 
+// AckActorClosed - Invoked by each actors go routine when it shuts down there by acknowledging the actor systems RequestClose call
 func (actorSys *actorSystem) AckActorClosed() {
 	mutex.Lock()
 	actorSys.ActorCloseAcked <- true
 	mutex.Unlock()
 }
 
-func (actorSys *actorSystem) InitActorSystem(messageQueue chan Message) {
+// Start - Starts the actor system by taking the master messageQueue facilitating the routing and execution of messages by the registered actors
+func (actorSys *actorSystem) Start(messageQueue chan Message) {
 	go actorSys.actOnMessages()
 	go actorSys.startDispatcher(messageQueue)
 }
+
 func (actorSys *actorSystem) startDispatcher(incomingMessages chan Message) {
 	for {
 		select {

@@ -18,12 +18,12 @@ var (
 func main() {
 	signal.Notify(killPill, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSTOP, syscall.SIGTSTP)
 	oncomingMessages := samples.InitSampleMessageQueue()
-	core.GetDefaultRegistry().InitActorSystem(oncomingMessages)
+	core.GetDefaultActorSystem().Start(oncomingMessages)
 	for {
 		select {
 		case <-killPill:
 			fmt.Println(fmt.Sprintf("\n\n******--- Shutting down due to SIGTERM ---******"))
-			core.GetDefaultRegistry().Close(terminateProcess)
+			core.GetDefaultActorSystem().Close(terminateProcess)
 		case <-terminateProcess:
 			fmt.Println(fmt.Sprintf("\n\n******--- Actor system is stopped, exiting ---******"))
 			return

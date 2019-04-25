@@ -1,9 +1,11 @@
 package core
 
+// ActionableMessage - Coalesce message with its registered handler
 type ActionableMessage struct {
 	Message
 	Handler func(message Message)
 }
+
 type messageStack []*ActionableMessage
 
 func (b *messageStack) Clear() {

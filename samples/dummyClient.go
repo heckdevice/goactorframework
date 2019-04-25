@@ -29,7 +29,7 @@ func pumpMessages() {
 			Mode:        core.Broadcast,
 			Sender:      &dummySender,
 			Payload:     map[string]interface{}{"data": rand.Int()},
-			BroadcastTo: []*core.ActorReference{&core.ActorReference{ActorType: printmessage.ActorType}, &core.ActorReference{ActorType: echomessage.ActorType}}}
+			BroadcastTo: []*core.ActorReference{{ActorType: printmessage.ActorType}, {ActorType: echomessage.ActorType}}}
 		messageQueue <- core.Message{MessageType: common.ConsolePrint, Mode: core.Unicast, Sender: &dummySender, Payload: map[string]interface{}{"data": rand.Int()}, UnicastTo: &core.ActorReference{ActorType: echomessage.ActorType}}
 		messageQueue <- core.Message{MessageType: common.ConsolePrint, Mode: core.Unicast, Sender: &dummySender, Payload: map[string]interface{}{"data": rand.Int()}, UnicastTo: &core.ActorReference{ActorType: printmessage.ActorType}}
 		messageQueue <- core.Message{MessageType: echomessage.MessageTypeHI, Mode: core.Unicast, Sender: &dummySender, Payload: map[string]interface{}{"data": rand.Int()}, UnicastTo: &core.ActorReference{ActorType: echomessage.ActorType}}

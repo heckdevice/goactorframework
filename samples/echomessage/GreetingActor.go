@@ -16,7 +16,7 @@ const (
 
 func InitActor() {
 	greetingActor := core.Actor{ActorType: ActorType}
-	err := core.GetDefaultRegistry().RegisterActor(&greetingActor, MessageTypeHI, greetHI)
+	err := core.GetDefaultActorSystem().RegisterActor(&greetingActor, MessageTypeHI, greetHI)
 	if err != nil {
 		log.Panic(fmt.Sprintf("Error while registering actor %v. Details : %v", greetingActor.ActorType, err.Error()))
 	}

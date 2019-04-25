@@ -1,12 +1,13 @@
 package core
 
+// GenericDataPipe - Basic structure to facilitate a data and close channel
 type GenericDataPipe struct {
 	dataChan            chan Message
 	closeChan           chan bool
 	isAcceptingMessages bool
 }
 
-// Actor - Actor model
+// Actor - Actor model with embedded data pipeline and message stack
 type Actor struct {
 	GenericDataPipe
 	id                   string

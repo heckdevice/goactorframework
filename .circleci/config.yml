@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.12.1
     working_directory: /go/src/github.com/heckdevice/goactorframework
     steps:
       - checkout
@@ -20,7 +20,7 @@ jobs:
             go test -v ./...
   deploy:
     docker:
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.12.1
     working_directory: /go/src/github.com/heckdevice/goactorframework
     steps:
       - checkout

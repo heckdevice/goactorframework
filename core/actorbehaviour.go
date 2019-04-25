@@ -100,10 +100,10 @@ func (actor *Actor) SpawnActor() {
 		case <-actor.closeChan:
 			log.Println(fmt.Sprintf("Actor %v closing down due to close signal", actor.ActorType))
 			actor.owner.AckActorClosed()
+			close(actor.dataChan)
+			close(actor.closeChan)
+			actor.internalMessageQueue.Clear()
 			return
 		}
 	}
-	close(actor.dataChan)
-	close(actor.closeChan)
-	actor.internalMessageQueue.Clear()
 }

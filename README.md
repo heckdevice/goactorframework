@@ -6,28 +6,29 @@
 A simple actor framework for go
 
 # platfrom version
-go version go1.11.2
+go version go1.12.1
 
 # how to run
 go run main.go
 
 # Usage
 
- Get Default Registry by invoking core.GetDefaultRegistry()
+ Get Default Actor system by invoking core.GetDefaultActorSystem()
  
- Registry interface has following features :
+ ActorSystem interface has following features :
  ```
- type registryInterface interface {
-	InitActorSystem(messageQueue chan Message)
+// ActorSystem - Features of actor system
+type ActorSystem interface {
+	Start(messageQueue chan Message)
 	Close(terminateProcess chan bool)
 	RegisterActor(actor *Actor, messageType string, handler func(message Message)) error
 	UnregisterActor(string) error
 	GetActor(actorType string) (ActorMessagePipe, error)
 }
  ```
- Initialize the actor system using InitActorSystem function which takes the incoming message channel as in main.go
+ Start the actor system using Start function which takes the message channel to pick messages from 
  ```
- core.GetDefaultRegistry().InitActorSystem(samples.InitSampleMessageQueue())
+ core.GetDefaultActorSystem().Start(<processing message channle>)
  ```
  
  In sample examples this is provided by the InitSampleMessageQueue function
@@ -48,9 +49,9 @@ go run main.go
   ```
   printActor := core.Actor{ActorType: ActorType}
   ```
-  - Using the DefaultRegistry register the actor providing a MessageType (string) and its respective handler function
+  - Using the DefaultActorSystem we register the actor providing a MessageType (string) and its respective handler function
   ```
-  err := core.GetDefaultRegistry().RegisterActor(&printActor, common.ConsolePrint, consolePrint)
+  err := core.GetDefaultActorSystem().RegisterActor(&printActor, common.ConsolePrint, consolePrint)
   ```
   A handler function can be any function of type 
   ```

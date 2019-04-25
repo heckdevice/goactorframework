@@ -22,7 +22,8 @@ func InitSampleMessageQueue() chan core.Message {
 }
 
 func pumpMessages() {
-	dummySender := core.ActorReference{"ActorSystem"}
+	dummySender := core.ActorReference{}
+	dummySender.ActorType = "ActorSystem"
 	for {
 		messageQueue <- core.Message{MessageType: common.ConsolePrint,
 			Mode:        core.Broadcast,

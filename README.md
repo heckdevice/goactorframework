@@ -1,3 +1,7 @@
+[![CircleCI](https://circleci.com/gh/heckdevice/goactorframework.svg?style=svg)](https://circleci.com/gh/heckdevice/goactorframework)
+[![Go Report Card](https://goreportcard.com/badge/github.com/heckdevice/goactorframework)](https://goreportcard.com/report/github.com/heckdevice/goactorframework)
+
+
 # goactorframework
 A simple actor framework for go
 

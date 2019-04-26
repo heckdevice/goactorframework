@@ -30,8 +30,7 @@ jobs:
       - run:
           name: cross compile
           command: |
-            gox -os="linux darwin" -arch="amd64" -output="dist/gobc_{{.OS}}_{{.Arch}}"
-            cd dist/ && gzip *
+            gox -os="linux darwin" -arch="amd64" -output="dist/goactorframework_{{.OS}}_{{.Arch}}"
 workflows:
   version: 2
   build-deploy:

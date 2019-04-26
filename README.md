@@ -1,5 +1,5 @@
-[![CircleCI](https://circleci.com/gh/heckdevice/goactorframework.svg?style=svg)](https://circleci.com/gh/heckdevice/goactorframework)
-[![Go Report Card](https://goreportcard.com/badge/github.com/heckdevice/goactorframework)](https://goreportcard.com/report/github.com/heckdevice/goactorframework)
+[![CircleCI](https://circleci.com/gh/heckdevice/goactorframework-corelib.svg?style=svg)](https://circleci.com/gh/heckdevice/goactorframework-corelib)
+[![Go Report Card](https://goreportcard.com/badge/github.com/heckdevice/goactorframework-corelib)](https://goreportcard.com/report/github.com/heckdevice/goactorframework-corelib)
 
 
 # goactorframework

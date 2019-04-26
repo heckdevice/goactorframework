@@ -8,8 +8,6 @@ A simple actor framework for go
 # platfrom version
 go version go1.12.1
 
-# how to run
-go run main.go
 
 # Usage
 
@@ -30,18 +28,6 @@ type ActorSystem interface {
  ```
  core.GetDefaultActorSystem().Start(<processing message channle>)
  ```
- 
- In sample examples this is provided by the InitSampleMessageQueue function
- 
- ```
- func InitSampleMessageQueue() chan core.Message {
-	printmessage.InitActor()
-	echomessage.InitActor()
-	go pumpMessages()
-	return messageQueue
-}
- ```
- There we initialze two sample actor of type "PrintActor" and "GreetingActor"
  
  To write a new actor all we need to do is the following :
  
@@ -67,4 +53,6 @@ type ActorSystem interface {
   ```
   go printActor.SpawnActor()
   ```
- Please review main.go and any of the actors in "samples" directory to see the detailed design and usage
+ # References  
+  For details refer goactorframework-examples  
+  - https://github.com/heckdevice/goactorframework-examples
